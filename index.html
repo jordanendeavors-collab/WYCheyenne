@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheyenneWatch — Your Neighborhood Front Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root,[data-theme="light"]{
+  --bg:#F7F4EF;--card:#FFFFFF;--border:#E0D9CE;--border2:#D0C8BB;
+  --night:#1A1F2E;--dusk:#2C3550;--muted:#7A7060;--clay:#C0460A;
+  --ember:#E06820;--info:#1A6FA8;--danger:#B02020;--warn:#B87010;
+  --success:#2A7A50;--text:#1A1F2E;--text2:#4A4840;--text3:#7A7060;
+  --masthead-bg:#1A1F2E;--sec-border:#1A1F2E;--sec-color:#1A1F2E;
+  --alert-bg:#FFFFFF;--smart-bg:#FFF8F4;--tip-bg:#FFF8F4;--tip-border:#F0D0B8;
+  --footer-bg:#1A1F2E;--tog-bg:rgba(255,255,255,0.12);
+}
+[data-theme="dark"]{
+  --bg:#0D1117;--card:#161B25;--border:#1E2535;--border2:#263044;
+  --night:#080C14;--dusk:#1A2238;--muted:#5A6070;--clay:#C0460A;
+  --ember:#E06820;--info:#2A80C0;--danger:#C83030;--warn:#C88020;
+  --success:#2A7A50;--text:#D8DCE8;--text2:#A0A8B8;--text3:#606878;
+  --masthead-bg:#080C14;--sec-border:#E06820;--sec-color:#D8DCE8;
+  --alert-bg:#161B25;--smart-bg:#1E1510;--tip-bg:#1E1510;--tip-border:#3A2818;
+  --footer-bg:#080C14;--tog-bg:rgba(224,104,32,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;min-height:100vh;transition:background .3s,color .3s;}
+
+/* THEME TOGGLE */
+.theme-toggle{background:var(--tog-bg);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);width:38px;height:38px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.theme-toggle:hover{background:rgba(224,104,32,0.25);border-color:var(--ember);color:white;}
+
+/* PIRATE OVERLAY */
+#pirate-overlay{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;}
+#pirate-overlay.active{display:flex;}
+body.busted{animation:siteFlash .5s ease 3;}
+@keyframes siteFlash{0%,100%{outline:0px solid transparent;}25%,75%{outline:6px solid #ff3b00;box-shadow:inset 0 0 80px rgba(255,59,0,.15);}}
+.pirate-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);cursor:pointer;}
+.pirate-modal{position:relative;z-index:1;background:#1A1F2E;border:2px solid var(--ember);max-width:720px;width:100%;overflow:hidden;box-shadow:0 0 80px rgba(224,104,32,.4),0 40px 80px rgba(0,0,0,.6);animation:modalPop .35s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes modalPop{from{transform:scale(.7) translateY(40px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.pirate-header{background:linear-gradient(135deg,var(--clay),var(--ember));padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.pirate-hed{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:white;line-height:1.1;}
+.pirate-subhed{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:4px;}
+.pirate-close{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);color:white;width:36px;height:36px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.pirate-close:hover{background:rgba(0,0,0,.6);}
+.video-tabs{display:flex;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07);overflow-x:auto;}
+.vtab{padding:10px 18px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.vtab:hover{color:rgba(255,255,255,.7);}
+.vtab.active{color:var(--ember);border-bottom-color:var(--ember);}
+.video-frame{position:relative;padding-bottom:52%;height:0;overflow:hidden;background:#000;}
+.video-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.pirate-footer{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.07);}
+.pirate-caption{font-size:.82rem;color:rgba(255,255,255,.5);flex:1;line-height:1.4;}
+.pirate-caption strong{color:var(--ember);}
+.pirate-cta{background:var(--ember);border:none;color:white;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background .2s;text-decoration:none;display:inline-block;}
+.pirate-cta:hover{background:var(--clay);}
+
+/* MASTHEAD */
+.masthead{background:var(--masthead-bg);border-bottom:3px solid var(--ember);position:sticky;top:0;z-index:100;transition:background .3s,box-shadow .3s;}
+body.busted .masthead{box-shadow:0 0 40px rgba(255,59,0,.5);}
+.masthead-top{display:flex;align-items:center;justify-content:space-between;padding:14px 48px;border-bottom:1px solid rgba(255,255,255,.06);}
+.site-name{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:#fff;}
+.site-name span{color:var(--ember);}
+.masthead-right{display:flex;align-items:center;gap:14px;}
+.masthead-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.3);letter-spacing:.08em;text-align:right;line-height:1.6;}
+.nav-bar{display:flex;padding:0 48px;overflow-x:auto;}
+.nav-item{padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.38);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;flex-shrink:0;user-select:none;}
+.nav-item:hover{color:rgba(255,255,255,.8);}
+.nav-item.active{color:var(--ember);border-bottom-color:var(--ember);}
+
+/* TICKER */
+.ticker{background:var(--clay);padding:7px 48px;display:flex;align-items:center;gap:14px;overflow:hidden;}
+.ticker-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:white;background:rgba(0,0,0,.2);padding:3px 10px;flex-shrink:0;}
+.ticker-scroll{font-size:.78rem;color:rgba(255,255,255,.92);white-space:nowrap;animation:ticker 38s linear infinite;}
+@keyframes ticker{0%{transform:translateX(70vw);}100%{transform:translateX(-100%);}}
+
+/* LAYOUT */
+.page-wrap{max-width:1280px;margin:0 auto;padding:28px 48px;}
+.main-grid{display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start;}
+
+/* TAB SECTIONS — hide/show */
+.tab-section{display:none;}
+.tab-section.active{display:block;}
+
+/* WEATHER */
+.weather-card{background:linear-gradient(135deg,#0D1117,#1A2238);color:white;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;border:1px solid var(--border);transition:box-shadow .3s;}
+[data-theme="light"] .weather-card{background:linear-gradient(135deg,#1A1F2E,#2C3550);}
+body.busted .weather-card{box-shadow:0 0 30px rgba(255,59,0,.3);}
+.weather-card::after{content:'☀';position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:5.5rem;opacity:.07;}
+.weather-location{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.38);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;}
+.weather-temp{font-family:'Playfair Display',serif;font-size:3.8rem;font-weight:900;color:var(--ember);line-height:1;}
+.weather-desc{color:rgba(255,255,255,.55);font-size:.88rem;margin-top:5px;}
+.weather-row{display:flex;gap:24px;margin-top:14px;flex-wrap:wrap;}
+.weather-stat{font-size:.78rem;color:rgba(255,255,255,.45);}
+.weather-stat strong{color:rgba(255,255,255,.82);display:block;font-size:.96rem;}
+.weather-full-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+.wf-card{background:var(--card);border:1px solid var(--border);padding:16px;text-align:center;}
+.wf-day{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.wf-icon{font-size:1.8rem;margin-bottom:6px;}
+.wf-hi{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ember);}
+.wf-lo{font-size:.78rem;color:var(--muted);margin-top:2px;}
+
+/* SECTION HEAD */
+.section-head{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--sec-color);border-bottom:2px solid var(--sec-border);padding-bottom:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;transition:color .3s,border-color .3s;}
+.section-head .count{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.08em;font-weight:400;}
+
+/* ALERTS */
+.alert-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.alert-card{background:var(--alert-bg);border:1px solid var(--border);border-left:4px solid var(--border2);padding:14px 18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:box-shadow .2s,background .3s;}
+.alert-card:hover{box-shadow:0 3px 16px rgba(0,0,0,.15);}
+.alert-card.danger{border-left-color:var(--danger);}
+.alert-card.warn{border-left-color:var(--warn);}
+.alert-card.info{border-left-color:var(--info);}
+.alert-card.smart{border-left-color:var(--ember);background:var(--smart-bg);}
+.alert-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px;}
+.alert-title{font-weight:600;font-size:.92rem;color:var(--text);margin-bottom:3px;}
+.alert-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.06em;}
+.alert-tag{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;margin-left:8px;}
+.tag-danger{background:#FEECEC;color:var(--danger);}
+.tag-smart{background:#FDE8D8;color:var(--clay);}
+[data-theme="dark"] .tag-danger{background:rgba(200,48,48,.15);}
+[data-theme="dark"] .tag-smart{background:rgba(224,104,32,.15);}
+
+/* CRIME MAP */
+.crime-map{background:#0D1117;height:340px;position:relative;overflow:hidden;margin-bottom:24px;border:1px solid var(--border);transition:box-shadow .3s;}
+[data-theme="light"] .crime-map{background:#1A1F2E;}
+body.busted .crime-map{box-shadow:0 0 20px rgba(255,59,0,.25);}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;}
+.map-label{position:absolute;top:14px;left:14px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.3);letter-spacing:.12em;text-transform:uppercase;}
+.map-pin{position:absolute;width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;transition:transform .2s;}
+.map-pin:hover{transform:translate(-50%,-50%) scale(1.7);}
+.map-pin::after{content:attr(data-label);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);color:white;font-size:.62rem;padding:3px 8px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;margin-bottom:4px;font-family:'JetBrains Mono',monospace;}
+.map-pin:hover::after{opacity:1;}
+.pin-red{background:var(--danger);box-shadow:0 0 10px rgba(176,32,32,.6);}
+.pin-amber{background:var(--warn);box-shadow:0 0 8px rgba(184,112,16,.5);}
+.pin-blue{background:var(--info);box-shadow:0 0 7px rgba(26,111,168,.4);}
+.map-legend{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.65);padding:8px 12px;display:flex;flex-direction:column;gap:5px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:.56rem;color:rgba(255,255,255,.55);}
+.legend-dot{width:7px;height:7px;border-radius:50%;}
+
+/* FOOD */
+.food-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.food-card{background:var(--card);border:1px solid var(--border);padding:12px 14px;cursor:pointer;transition:all .2s;}
+.food-card:hover{border-color:var(--ember);}
+.food-name{font-weight:600;font-size:.85rem;color:var(--text);}
+.food-type{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.food-rating{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--ember);margin-top:5px;}
+
+/* QUICK LINKS */
+.quick-links{display:flex;flex-direction:column;}
+.quick-link{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--text2);cursor:pointer;transition:color .15s;}
+.quick-link:hover{color:var(--ember);}
+.quick-link:last-child{border-bottom:none;}
+.ql-icon{font-size:1rem;width:22px;text-align:center;}
+
+/* COMMUNITY */
+.community-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.comm-card{background:var(--card);border:1px solid var(--border);padding:16px;cursor:pointer;transition:all .2s;}
+.comm-card:hover{border-color:var(--ember);}
+.comm-title{font-weight:600;font-size:.88rem;color:var(--text);margin-bottom:4px;}
+.comm-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);}
+.comm-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;padding:2px 6px;margin-top:6px;background:rgba(224,104,32,.15);color:var(--ember);}
+
+/* SMART SECURITY PAGE */
+/* SMART SECURITY PAGE */
+.smart-hero{background:linear-gradient(135deg,#080C14,#1A2238);border:1px solid var(--border);padding:36px 32px;margin-bottom:24px;position:relative;overflow:hidden;}
+[data-theme="light"] .smart-hero{background:linear-gradient(135deg,#1A1F2E,#2C3550);}
+.smart-hero-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:white;margin-bottom:8px;}
+.smart-hero-title span{color:var(--ember);}
+.smart-hero-sub{font-size:.88rem;color:rgba(255,255,255,.5);line-height:1.6;max-width:560px;}
+.smart-cta-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.smart-hero-cta{display:inline-block;background:var(--ember);color:white;padding:12px 24px;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:background .2s;cursor:pointer;border:none;white-space:nowrap;}
+.smart-hero-cta:hover{background:var(--clay);}
+.smart-hero-cta.outline{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7);}
+.smart-hero-cta.outline:hover{background:rgba(255,255,255,.08);border-color:var(--ember);color:white;}
+
+/* SERVICE CATEGORY CARDS */
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px;}
+.svc-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--border2);padding:20px 18px;cursor:pointer;transition:all .2s;position:relative;}
+.svc-card:hover{border-color:var(--ember);border-top-color:var(--ember);transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,0,0,.15);}
+.svc-card.featured{border-top-color:var(--ember);}
+.svc-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;}
+.svc-icon{font-size:1.8rem;flex-shrink:0;margin-top:2px;}
+.svc-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.svc-tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:rgba(224,104,32,.12);color:var(--ember);}
+.svc-desc{font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+.svc-bullets{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.svc-bullet{display:flex;align-items:baseline;gap:7px;font-size:.76rem;color:var(--text2);}
+.svc-bullet::before{content:'→';color:var(--ember);font-family:'JetBrains Mono',monospace;font-size:.62rem;flex-shrink:0;}
+.svc-cta{display:inline-block;background:var(--ember);color:white;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:background .2s;cursor:pointer;border:none;}
+.svc-cta:hover{background:var(--clay);}
+.svc-cta.ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.svc-cta.ghost:hover{border-color:var(--ember);color:var(--ember);}
+
+/* PRODUCTS GRID (small) */
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.prod-card{background:var(--card);border:1px solid var(--border);padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;}
+.prod-card:hover{border-color:var(--ember);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.15);}
+.prod-icon{font-size:2rem;margin-bottom:10px;}
+.prod-name{font-weight:600;font-size:.88rem;color:var(--text);margin-bottom:4px;}
+.prod-desc{font-size:.72rem;color:var(--muted);line-height:1.4;}
+
+/* MAINTENANCE REMINDERS */
+.reminder-list{display:flex;flex-direction:column;gap:0;}
+.reminder-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.reminder-row:last-child{border-bottom:none;}
+.reminder-row:hover{background:var(--smart-bg);}
+.reminder-row.due{background:rgba(184,112,16,.08);}
+.reminder-row.overdue{background:rgba(176,32,32,.08);}
+.rem-icon{font-size:1.1rem;flex-shrink:0;width:24px;text-align:center;}
+.rem-text{flex:1;}
+.rem-title{font-size:.82rem;font-weight:600;color:var(--text);}
+.rem-sub{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:1px;}
+.rem-badge{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;flex-shrink:0;}
+.rem-badge.ok{background:rgba(42,122,80,.15);color:var(--success);}
+.rem-badge.due{background:rgba(184,112,16,.18);color:var(--warn);}
+.rem-badge.overdue{background:rgba(176,32,32,.18);color:var(--danger);}
+
+/* SUBSCRIBE FORM */
+.sub-form{padding:14px 16px;border-top:1px solid var(--border);background:var(--smart-bg);}
+.sub-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.sub-row{display:flex;gap:6px;}
+.sub-input{flex:1;background:var(--bg);border:1px solid var(--border);padding:8px 10px;font-size:.78rem;color:var(--text);font-family:'Source Sans 3',sans-serif;outline:none;transition:border-color .2s;}
+.sub-input:focus{border-color:var(--ember);}
+.sub-btn{background:var(--ember);border:none;color:white;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.sub-btn:hover{background:var(--clay);}
+.sub-note{font-size:.68rem;color:var(--muted);margin-top:6px;line-height:1.4;}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:18px;}
+.sidebar-widget{background:var(--card);border:1px solid var(--border);overflow:hidden;transition:box-shadow .3s,background .3s;}
+body.busted .sidebar-widget{box-shadow:0 0 16px rgba(255,59,0,.15);}
+.widget-head{background:var(--night);padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);}
+.widget-head.smart-head{background:var(--ember);}
+.widget-body{padding:16px 18px;}
+.mon-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.mon-row:last-child{border-bottom:none;}
+.mon-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.mon-dot.online{background:#10b981;box-shadow:0 0 5px rgba(16,185,129,.5);}
+.mon-dot.warn{background:var(--warn);}
+.mon-dot.offline{background:#4A5568;}
+.mon-label{font-size:.85rem;color:var(--text);font-weight:600;flex:1;}
+.mon-time{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);}
+.product-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.product-btn{background:none;border:1px solid var(--border);padding:13px 8px;cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.product-btn:hover{border-color:var(--ember);background:var(--smart-bg);}
+body.busted .product-btn{animation:btnPulse .6s ease 2;}
+@keyframes btnPulse{0%,100%{border-color:var(--border);}50%{border-color:#ff3b00;background:var(--smart-bg);box-shadow:0 0 12px rgba(255,59,0,.25);}}
+.product-btn .icon{font-size:1.3rem;}
+.product-btn .label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);}
+.contact-block{background:linear-gradient(135deg,#080C14,#1A2238);padding:22px 18px;text-align:center;}
+[data-theme="light"] .contact-block{background:linear-gradient(135deg,#1A1F2E,#2C3550);}
+.cb-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:white;margin-bottom:6px;}
+.cb-sub{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:18px;line-height:1.5;}
+.cb-phone{display:block;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--ember);text-decoration:none;margin-bottom:4px;transition:color .2s;}
+.cb-phone:hover{color:#ff8c44;}
+.cb-or{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.25);letter-spacing:.15em;margin:10px 0;}
+.cb-email{display:block;font-size:.78rem;color:rgba(255,255,255,.55);text-decoration:none;word-break:break-all;transition:color .2s;}
+.cb-email:hover{color:rgba(255,255,255,.85);}
+.cb-tagline{margin-top:14px;font-size:.72rem;color:rgba(255,255,255,.3);font-style:italic;}
+.safety-tip{display:flex;gap:13px;align-items:flex-start;background:var(--tip-bg);border:1px solid var(--tip-border);padding:16px;}
+.tip-icon{font-size:1.4rem;flex-shrink:0;}
+.tip-head{font-weight:600;font-size:.86rem;color:var(--clay);margin-bottom:3px;}
+.tip-text{font-size:.78rem;color:var(--text2);line-height:1.5;}
+.emerg-link{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.83rem;color:var(--text2);cursor:pointer;transition:color .15s;}
+.emerg-link:last-child{border-bottom:none;}
+.emerg-link:hover{color:var(--clay);}
+
+/* FOOTER */
+.brand-footer{background:var(--footer-bg);border-top:3px solid var(--ember);padding:22px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:48px;transition:background .3s;}
+.bf-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:white;}
+.bf-name span{color:var(--ember);}
+.bf-tagline{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:3px;}
+.bf-contact{text-align:right;}
+.bf-phone{font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--ember);text-decoration:none;display:block;}
+.bf-email{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:2px;}
+.bf-email a{color:inherit;text-decoration:none;}
+.bf-email a:hover{color:rgba(255,255,255,.65);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--night);border-left:3px solid var(--success);color:white;padding:12px 18px;font-size:.82rem;max-width:300px;z-index:500;transform:translateX(120%);transition:transform .3s;box-shadow:0 8px 28px rgba(0,0,0,.3);}
+.toast.show{transform:translateX(0);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .main-grid{grid-template-columns:1fr;}
+  .masthead-top,.nav-bar,.page-wrap,.ticker,.brand-footer{padding-left:20px;padding-right:20px;}
+  .food-grid,.community-grid,.products-grid,.weather-full-grid{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .masthead-top{padding:12px 16px;}
+  .site-name{font-size:1.4rem;}
+  .weather-temp{font-size:2.8rem;}
+}
+
+/* ══ WEATHER THEME ENGINE ══════════════════════════════════════════════════ */
+#weather-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55;}
+.masthead,.page-wrap,.ticker,.brand-footer,.sidebar-widget,.alert-card,.weather-card,.food-card,.comm-card,.crime-map,.wf-card{position:relative;z-index:1;}
+body{transition:background 2s ease,color .3s;}
+
+/* DAWN themes */
+body.theme-dawn-summer   {background:linear-gradient(180deg,#1a0a2e 0%,#2d1b4e 20%,#7b3f6e 45%,#e8855a 70%,#f5c842 100%);}
+body.theme-dawn-fall     {background:linear-gradient(180deg,#0d1117 0%,#1a1206 20%,#3d2008 45%,#8b4513 70%,#d4820a 100%);}
+body.theme-dawn-winter   {background:linear-gradient(180deg,#0a0e1a 0%,#1a2340 20%,#2e3f6e 45%,#7a9cc8 70%,#c8d8f0 100%);}
+body.theme-dawn-spring   {background:linear-gradient(180deg,#0d0a1a 0%,#1a0d2e 20%,#4a2060 45%,#b06090 70%,#f0a060 100%);}
+
+/* DAY themes */
+body.theme-day-summer    {background:linear-gradient(180deg,#0a1628 0%,#0d2240 30%,#1a3a5c 100%);}
+body.theme-day-fall      {background:linear-gradient(180deg,#1a0e06 0%,#2d1a08 30%,#4a2d10 100%);}
+body.theme-day-winter    {background:linear-gradient(180deg,#0a0f1e 0%,#111827 30%,#1a2540 100%);}
+body.theme-day-spring    {background:linear-gradient(180deg,#061408 0%,#0d2210 30%,#132e18 100%);}
+
+/* DUSK themes */
+body.theme-dusk-summer   {background:linear-gradient(180deg,#0a1020 0%,#1a1030 25%,#4a2040 50%,#c04020 75%,#e87020 100%);}
+body.theme-dusk-fall     {background:linear-gradient(180deg,#0d0a06 0%,#1a1208 25%,#3a2010 50%,#7a3808 75%,#c06010 100%);}
+body.theme-dusk-winter   {background:linear-gradient(180deg,#080c18 0%,#0e1426 25%,#1a2440 50%,#304070 75%,#506090 100%);}
+body.theme-dusk-spring   {background:linear-gradient(180deg,#06100a 0%,#0e1c12 25%,#1c3020 50%,#3a5828 75%,#c87040 100%);}
+
+/* NIGHT themes */
+body.theme-night-summer  {background:linear-gradient(180deg,#020408 0%,#04080e 40%,#060c14 100%);}
+body.theme-night-fall    {background:linear-gradient(180deg,#060402 0%,#0a0804 40%,#0e0c06 100%);}
+body.theme-night-winter  {background:linear-gradient(180deg,#02040a 0%,#04080e 40%,#060a12 100%);}
+body.theme-night-spring  {background:linear-gradient(180deg,#020604 0%,#040a06 40%,#060e08 100%);}
+
+/* STAR overlay for night */
+body.theme-night-summer::before,body.theme-night-fall::before,
+body.theme-night-winter::before,body.theme-night-spring::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.8),transparent),
+    radial-gradient(1px 1px at 25% 8%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1.5px 1.5px at 40% 20%,rgba(255,255,255,.9),transparent),
+    radial-gradient(1px 1px at 55% 5%,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 70% 12%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1.5px 1.5px at 82% 18%,rgba(255,255,255,.8),transparent),
+    radial-gradient(1px 1px at 92% 7%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1px 1px at 15% 30%,rgba(255,255,255,.4),transparent),
+    radial-gradient(1px 1px at 35% 35%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1px 1px at 60% 28%,rgba(255,255,255,.3),transparent),
+    radial-gradient(1px 1px at 75% 32%,rgba(255,255,255,.4),transparent),
+    radial-gradient(1px 1px at 88% 25%,rgba(255,255,255,.5),transparent);
+}
+
+/* LIGHT mode override — keep cards readable */
+[data-theme="light"] .weather-card,[data-theme="light"] .sidebar-widget,
+[data-theme="light"] .alert-card,[data-theme="light"] .food-card{background:rgba(255,255,255,.92)!important;}
+[data-theme="dark"] .weather-card,[data-theme="dark"] .sidebar-widget,
+[data-theme="dark"] .alert-card,[data-theme="dark"] .food-card{background:rgba(22,27,37,.92)!important;}
+
+/* WEATHER badge in masthead */
+#weather-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 10px;background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+  white-space:nowrap;flex-shrink:0;
+}
+/* ══ END WEATHER THEME ══════════════════════════════════════════════════ */
+
+
+/* ══ WEATHER THEME ENGINE ══════════════════════════════════════════════════ */
+#weather-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55;}
+.masthead,.page-wrap,.ticker,.brand-footer,.sidebar-widget,.alert-card,.weather-card,.food-card,.comm-card,.crime-map,.wf-card{position:relative;z-index:1;}
+body{transition:background 2s ease,color .3s;}
+
+/* DAWN themes */
+body.theme-dawn-summer   {background:linear-gradient(180deg,#1a0a2e 0%,#2d1b4e 20%,#7b3f6e 45%,#e8855a 70%,#f5c842 100%);}
+body.theme-dawn-fall     {background:linear-gradient(180deg,#0d1117 0%,#1a1206 20%,#3d2008 45%,#8b4513 70%,#d4820a 100%);}
+body.theme-dawn-winter   {background:linear-gradient(180deg,#0a0e1a 0%,#1a2340 20%,#2e3f6e 45%,#7a9cc8 70%,#c8d8f0 100%);}
+body.theme-dawn-spring   {background:linear-gradient(180deg,#0d0a1a 0%,#1a0d2e 20%,#4a2060 45%,#b06090 70%,#f0a060 100%);}
+
+/* DAY themes */
+body.theme-day-summer    {background:linear-gradient(180deg,#0a1628 0%,#0d2240 30%,#1a3a5c 100%);}
+body.theme-day-fall      {background:linear-gradient(180deg,#1a0e06 0%,#2d1a08 30%,#4a2d10 100%);}
+body.theme-day-winter    {background:linear-gradient(180deg,#0a0f1e 0%,#111827 30%,#1a2540 100%);}
+body.theme-day-spring    {background:linear-gradient(180deg,#061408 0%,#0d2210 30%,#132e18 100%);}
+
+/* DUSK themes */
+body.theme-dusk-summer   {background:linear-gradient(180deg,#0a1020 0%,#1a1030 25%,#4a2040 50%,#c04020 75%,#e87020 100%);}
+body.theme-dusk-fall     {background:linear-gradient(180deg,#0d0a06 0%,#1a1208 25%,#3a2010 50%,#7a3808 75%,#c06010 100%);}
+body.theme-dusk-winter   {background:linear-gradient(180deg,#080c18 0%,#0e1426 25%,#1a2440 50%,#304070 75%,#506090 100%);}
+body.theme-dusk-spring   {background:linear-gradient(180deg,#06100a 0%,#0e1c12 25%,#1c3020 50%,#3a5828 75%,#c87040 100%);}
+
+/* NIGHT themes */
+body.theme-night-summer  {background:linear-gradient(180deg,#020408 0%,#04080e 40%,#060c14 100%);}
+body.theme-night-fall    {background:linear-gradient(180deg,#060402 0%,#0a0804 40%,#0e0c06 100%);}
+body.theme-night-winter  {background:linear-gradient(180deg,#02040a 0%,#04080e 40%,#060a12 100%);}
+body.theme-night-spring  {background:linear-gradient(180deg,#020604 0%,#040a06 40%,#060e08 100%);}
+
+/* STAR overlay for night */
+body.theme-night-summer::before,body.theme-night-fall::before,
+body.theme-night-winter::before,body.theme-night-spring::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.8),transparent),
+    radial-gradient(1px 1px at 25% 8%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1.5px 1.5px at 40% 20%,rgba(255,255,255,.9),transparent),
+    radial-gradient(1px 1px at 55% 5%,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 70% 12%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1.5px 1.5px at 82% 18%,rgba(255,255,255,.8),transparent),
+    radial-gradient(1px 1px at 92% 7%,rgba(255,255,255,.6),transparent),
+    radial-gradient(1px 1px at 15% 30%,rgba(255,255,255,.4),transparent),
+    radial-gradient(1px 1px at 35% 35%,rgba(255,255,255,.5),transparent),
+    radial-gradient(1px 1px at 60% 28%,rgba(255,255,255,.3),transparent),
+    radial-gradient(1px 1px at 75% 32%,rgba(255,255,255,.4),transparent),
+    radial-gradient(1px 1px at 88% 25%,rgba(255,255,255,.5),transparent);
+}
+
+/* LIGHT mode override — keep cards readable */
+[data-theme="light"] .weather-card,[data-theme="light"] .sidebar-widget,
+[data-theme="light"] .alert-card,[data-theme="light"] .food-card{background:rgba(255,255,255,.92)!important;}
+[data-theme="dark"] .weather-card,[data-theme="dark"] .sidebar-widget,
+[data-theme="dark"] .alert-card,[data-theme="dark"] .food-card{background:rgba(22,27,37,.92)!important;}
+
+/* WEATHER badge in masthead */
+#weather-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 10px;background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+  white-space:nowrap;flex-shrink:0;
+}
+/* ══ END WEATHER THEME ══════════════════════════════════════════════════ */
+
+</style>
+</head>
+<body>
+<canvas id="weather-canvas"></canvas>
+
+
+
+<div id="pirate-overlay">
+  <div class="pirate-backdrop" onclick="closePirate()"></div>
+  <div class="pirate-modal">
+    <div class="pirate-header">
+      <div><div class="pirate-hed">🚨 Your Local Porch Pirate — Getting BUSTED</div><div class="pirate-subhed">This is why your neighbors have cameras. Just saying.</div></div>
+      <button class="pirate-close" onclick="closePirate()">✕</button>
+    </div>
+    <div class="video-tabs">
+      <div class="vtab active" onclick="switchVideo(0)">🎇 Glitter Bomb 3.0</div>
+      <div class="vtab" onclick="switchVideo(1)">💥 Glitter Bomb 4.0</div>
+      <div class="vtab" onclick="switchVideo(2)">🚁 Drone Bomb 5.0</div>
+      <div class="vtab" onclick="switchVideo(3)">🚗 Car Thief 6.0</div>
+      <div class="vtab" onclick="switchVideo(4)">😂 Karma Hits</div>
+      <div class="vtab" onclick="switchVideo(5)">🎲 Best Boomerang</div>
+    </div>
+    <div class="video-frame"><iframe id="pirate-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+    <div class="pirate-footer">
+      <div class="pirate-caption" id="pirate-caption"><strong>Glitter Bomb 3.0</strong> — Former NASA engineer rigs a bait package with glitter, fart spray & hidden cameras. Priceless.</div>
+      <a class="pirate-cta" href="tel:6023185756">Don't Be Next — Call Us</a>
+    </div>
+  </div>
+</div>
+
+
+<div class="masthead">
+  <div class="masthead-top">
+    <div class="site-name">Cheyenne<span>Watch</span></div>
+    <div class="masthead-right">
+      <div class="masthead-meta">Cheyenne, WY 82001<br><span id="live-time"></span></div>
+      <span id="weather-badge" style="font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);white-space:nowrap;flex-shrink:0;">&#9728;</span><button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    </div>
+  </div>
+  <nav class="nav-bar">
+    <div class="nav-item active" data-tab="overview">Overview</div>
+    <div class="nav-item" data-tab="alerts">Alerts</div>
+    <div class="nav-item" data-tab="crimemap">Crime Map</div>
+    <div class="nav-item" data-tab="weather">Weather</div>
+    <div class="nav-item" data-tab="community">Community</div>
+    <div class="nav-item" data-tab="food">Food &amp; Local</div>
+    <div class="nav-item" data-tab="smart" style="color:var(--ember);">🛡 Smart Security</div>
+  </nav>
+</div>
+
+<div class="ticker">
+  <span class="ticker-label">Live</span>
+  <span class="ticker-scroll">🌨️ WINTER STORM WATCH — 6–10" snow forecast overnight · I-25 &amp; I-80 corridor alerts &nbsp;&nbsp;|&nbsp;&nbsp; 🚨 Vehicle break-in reported Lincolnway corridor · 2 incidents this week &nbsp;&nbsp;|&nbsp;&nbsp; 🏘️ City Council meeting Tue 6PM · Cheyenne Civic Center &nbsp;&nbsp;|&nbsp;&nbsp; 🛡️ Tip: Blizzard conditions are cover for property crime — motion lights are your first line &nbsp;&nbsp;|&nbsp;&nbsp; 🚔 CCSO checkpoints active I-25 southbound this weekend &nbsp;&nbsp;|&nbsp;&nbsp; 🍽️ New: The Albany restaurant remodel complete — now open weekends</span>
+</div>
+
+<div class="page-wrap">
+  <div class="main-grid">
+    <div>
+
+      <!-- OVERVIEW -->
+      <div class="tab-section active" id="tab-overview">
+        <div class="weather-card">
+          <div class="weather-location">📍 Cheyenne, WY · Right Now</div>
+          <div class="weather-temp">22°F</div>
+          <div class="weather-desc">Heavy Snow · Feels like 9°F · Wind Chill Warning · Winter Storm Watch in Effect</div>
+          <div class="weather-row">
+            <div class="weather-stat"><strong>78%</strong>Humidity</div>
+            <div class="weather-stat"><strong>28 mph NNW</strong>Wind</div>
+            <div class="weather-stat"><strong>8°F</strong>Tonight Low</div>
+            <div class="weather-stat"><strong>30°F</strong>Tomorrow</div>
+          </div>
+        </div>
+        <div class="section-head">Neighborhood Alerts <span class="count">Active · Updated just now</span></div>
+        <div class="alert-list"><div class="alert-card danger"><div class="alert-icon">🌨️</div><div><div class="alert-title">Winter Storm Watch — 6–10" Snow Overnight <span class="alert-tag tag-danger">Active</span></div><div class="alert-meta">NWS Cheyenne · I-25 &amp; I-80 corridor · Blizzard conditions possible Tuesday</div></div></div>
+<div class="alert-card danger"><div class="alert-icon">🚨</div><div><div class="alert-title">Vehicle Break-Ins — Lincolnway Corridor</div><div class="alert-meta">2 incidents this week · Laramie County Case #2026-2201 · Downtown parking lots</div></div></div>
+<div class="alert-card warn"><div class="alert-icon">📦</div><div><div class="alert-title">Package Theft Spike — South Cheyenne Residential Areas</div><div class="alert-meta">4 reports this week · Peak window: 10AM–2PM · Doorbell cameras recommended</div></div></div>
+<div class="alert-card info"><div class="alert-icon">🚔</div><div><div class="alert-title">CCSO Checkpoint — I-25 Southbound This Weekend</div><div class="alert-meta">Active Fri–Sun · Sobriety &amp; safety inspection checkpoint</div></div></div>
+<div class="alert-card smart" onclick="openPirate(0)"><div class="alert-icon">🛡️</div><div><div class="alert-title">Package Theft Up 19% This Month — Watch What Happens 😂 <span class="alert-tag tag-smart">Watch Now</span></div><div class="alert-meta">Click to see your local porch pirate get exactly what they deserve → Spoiler: glitter.</div></div></div></div>
+        <div class="section-head">Quick Links</div>
+        <div class="quick-links"><div class="quick-link"><span class="ql-icon">🗑️</span>City of Cheyenne Sanitation &amp; Trash Pickup</div>
+<div class="quick-link"><span class="ql-icon">⚡</span>Rocky Mountain Power Outage Map</div>
+<div class="quick-link"><span class="ql-icon">🛣️</span>WYDOT 511 — Road Conditions &amp; Closures</div>
+<div class="quick-link"><span class="ql-icon">❄️</span>Cheyenne Snow Removal Tracker</div>
+<div class="quick-link"><span class="ql-icon">🏛️</span>Cheyenne City Council &amp; Laramie County</div>
+<div class="quick-link"><span class="ql-icon">💧</span>Cheyenne Board of Public Utilities</div></div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="tab-section" id="tab-alerts">
+        <div class="section-head">All Active Alerts <span class="count">Updated just now</span></div>
+        <div class="alert-list"><div class="alert-card danger"><div class="alert-icon">🌨️</div><div><div class="alert-title">Winter Storm Watch — 6–10" Snow Overnight <span class="alert-tag tag-danger">Active</span></div><div class="alert-meta">NWS Cheyenne · I-25 &amp; I-80 corridor · Blizzard conditions possible Tuesday</div></div></div>
+<div class="alert-card danger"><div class="alert-icon">🚨</div><div><div class="alert-title">Vehicle Break-Ins — Lincolnway Corridor</div><div class="alert-meta">2 incidents · Laramie County Case #2026-2201 · Downtown parking lots</div></div></div>
+<div class="alert-card warn"><div class="alert-icon">📦</div><div><div class="alert-title">Package Theft — South Cheyenne Residential</div><div class="alert-meta">4 reports this week · Peak: 10AM–2PM</div></div></div>
+<div class="alert-card warn"><div class="alert-icon">🔓</div><div><div class="alert-title">Unlocked Vehicle Entries — College Dr Area</div><div class="alert-meta">3 vehicles entered overnight · No damage · Lock your car</div></div></div>
+<div class="alert-card warn"><div class="alert-icon">🏚️</div><div><div class="alert-title">Vacant Property Trespassing — Historic Downtown</div><div class="alert-meta">2 reports · Abandoned storefronts on 16th &amp; Pioneer Ave</div></div></div>
+<div class="alert-card info"><div class="alert-icon">🚔</div><div><div class="alert-title">CCSO Checkpoint — I-25 Southbound This Weekend</div><div class="alert-meta">Fri–Sun · Sobriety &amp; safety inspection</div></div></div>
+<div class="alert-card info"><div class="alert-icon">🏛️</div><div><div class="alert-title">City Council Meeting — Tuesday 6PM</div><div class="alert-meta">Cheyenne Civic Center · Agenda: Snow removal contract, downtown lighting</div></div></div>
+<div class="alert-card smart" onclick="openPirate(0)"><div class="alert-icon">🛡️</div><div><div class="alert-title">Package Theft Up 19% — Watch What Happens 😂 <span class="alert-tag tag-smart">Watch Now</span></div><div class="alert-meta">Click to see your local porch pirate get what they deserve → Spoiler: glitter.</div></div></div></div>
+      </div>
+
+      <!-- CRIME MAP -->
+      <div class="tab-section" id="tab-crimemap">
+        <div class="section-head">Area Crime Map <span class="count">Last 7 days · 82001</span></div>
+        <div class="crime-map">
+          <div class="map-grid"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.14;" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="85" x2="800" y2="85" stroke="white" stroke-width="2"/>
+<line x1="0" y1="170" x2="800" y2="170" stroke="white" stroke-width="3"/>
+<line x1="0" y1="255" x2="800" y2="255" stroke="white" stroke-width="2"/>
+<line x1="160" y1="0" x2="160" y2="340" stroke="white" stroke-width="2"/>
+<line x1="320" y1="0" x2="320" y2="340" stroke="white" stroke-width="2"/>
+<line x1="480" y1="0" x2="480" y2="340" stroke="white" stroke-width="3"/>
+<line x1="640" y1="0" x2="640" y2="340" stroke="white" stroke-width="2"/>
+            <text x="10" y="168" fill="rgba(255,255,255,.35)" font-size="9" font-family="monospace">LINCOLNWAY</text>
+<text x="10" y="253" fill="rgba(255,255,255,.35)" font-size="9" font-family="monospace">DEL RANGE BLVD</text>
+<text x="165" y="16" fill="rgba(255,255,255,.35)" font-size="9" font-family="monospace">CENTRAL AVE</text>
+<text x="325" y="16" fill="rgba(255,255,255,.35)" font-size="9" font-family="monospace">COLLEGE DR</text>
+<text x="485" y="16" fill="rgba(255,255,255,.35)" font-size="9" font-family="monospace">CONVERSE AVE</text>
+          </svg>
+          <div class="map-label">82001 · Cheyenne, WY · Hover pins</div>
+          <div class="map-pin pin-red" style="left:42%;top:50%;" data-label="Vehicle break-in · Lincolnway/Central"></div>
+<div class="map-pin pin-red" style="left:26%;top:68%;" data-label="Package theft · South residential area"></div>
+<div class="map-pin pin-red" style="left:55%;top:32%;" data-label="Unlocked vehicle entered · College Dr"></div>
+<div class="map-pin pin-amber" style="left:62%;top:58%;" data-label="Suspicious activity · Converse Ave corridor"></div>
+<div class="map-pin pin-amber" style="left:20%;top:28%;" data-label="Trespassing · Historic downtown vacant property"></div>
+<div class="map-pin pin-amber" style="left:46%;top:78%;" data-label="Suspicious vehicle · Del Range Blvd"></div>
+<div class="map-pin pin-blue" style="left:72%;top:44%;" data-label="Noise disturbance · E. 17th St"></div>
+<div class="map-pin pin-blue" style="left:34%;top:82%;" data-label="Traffic stop · Lincolnway/College"></div>
+          <div class="map-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--danger);"></span>Theft / Break-in</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--warn);"></span>Suspicious Activity</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--info);"></span>Non-emergency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEATHER -->
+      <div class="tab-section" id="tab-weather">
+        <div class="weather-card">
+          <div class="weather-location">📍 Cheyenne, WY · Right Now</div>
+          <div class="weather-temp">22°F</div>
+          <div class="weather-desc">Heavy Snow · Feels like 9°F · Wind Chill Warning · Winter Storm Watch in Effect</div>
+          <div class="weather-row">
+            <div class="weather-stat"><strong>78%</strong>Humidity</div>
+            <div class="weather-stat"><strong>28 mph NNW</strong>Wind</div>
+            <div class="weather-stat"><strong>8°F</strong>Tonight Low</div>
+            <div class="weather-stat"><strong>30°F</strong>Tomorrow</div>
+          </div>
+        </div>
+        <div class="section-head">7-Day Forecast</div>
+        <div class="weather-full-grid"><div class="wf-card"><div class="wf-day">Today</div><div class="wf-icon">🌨️</div><div class="wf-hi">22°F</div><div class="wf-lo">Lo: 8°F · Heavy Snow</div></div>
+<div class="wf-card"><div class="wf-day">Tue</div><div class="wf-icon">🌨️</div><div class="wf-hi">18°F</div><div class="wf-lo">Lo: 5°F · Blizzard</div></div>
+<div class="wf-card"><div class="wf-day">Wed</div><div class="wf-icon">⛅</div><div class="wf-hi">28°F</div><div class="wf-lo">Lo: 12°F · Clearing</div></div>
+<div class="wf-card"><div class="wf-day">Thu</div><div class="wf-icon">☀️</div><div class="wf-hi">36°F</div><div class="wf-lo">Lo: 18°F</div></div>
+<div class="wf-card"><div class="wf-day">Fri</div><div class="wf-icon">☀️</div><div class="wf-hi">42°F</div><div class="wf-lo">Lo: 20°F</div></div>
+<div class="wf-card"><div class="wf-day">Sat</div><div class="wf-icon">⛅</div><div class="wf-hi">38°F</div><div class="wf-lo">Lo: 16°F</div></div></div>
+        <div class="section-head" style="margin-top:24px;">Weather Advisories</div>
+        <div class="alert-list"><div class="alert-card danger"><div class="alert-icon">🌨️</div><div><div class="alert-title">Winter Storm Watch — Through Tuesday Evening</div><div class="alert-meta">NWS Cheyenne · 6–10" accumulation · I-25 &amp; I-80 may close · Have 72hr supplies ready</div></div></div>
+<div class="alert-card danger"><div class="alert-icon">🌬️</div><div><div class="alert-title">Wind Chill Warning — Feels Like -10°F to -20°F</div><div class="alert-meta">Exposed skin can freeze in under 30 min · Limit time outdoors overnight</div></div></div>
+<div class="alert-card warn"><div class="alert-icon">🛣️</div><div><div class="alert-title">Road Closures Possible — I-25 &amp; I-80 Corridor</div><div class="alert-meta">WYDOT monitoring conditions · Check 511.Wyoming.gov before any highway travel</div></div></div>
+<div class="alert-card info"><div class="alert-icon">❄️</div><div><div class="alert-title">City of Cheyenne Snow Removal Schedule</div><div class="alert-meta">Primary arterials cleared first · Residential routes within 48hrs of storm end</div></div></div></div>
+      </div>
+
+      <!-- COMMUNITY -->
+      <div class="tab-section" id="tab-community">
+        <div class="section-head">Community Events <span class="count">Upcoming</span></div>
+        <div class="community-grid"><div class="comm-card"><div class="comm-title">City Council Meeting</div><div class="comm-meta">Tue · 6PM · Cheyenne Civic Center</div><div class="comm-badge">This Week</div></div>
+<div class="comm-card"><div class="comm-title">Cheyenne Frontier Days Planning</div><div class="comm-meta">Thu · 7PM · Laramie County Fairgrounds</div><div class="comm-badge">This Week</div></div>
+<div class="comm-card"><div class="comm-title">Neighborhood Watch Meeting</div><div class="comm-meta">Wed · 6:30PM · Fire Station No. 1</div><div class="comm-badge">This Week</div></div>
+<div class="comm-card"><div class="comm-title">LCSD1 School Board Meeting</div><div class="comm-meta">Next Mon · 5:30PM · District Office</div><div class="comm-badge">Upcoming</div></div>
+<div class="comm-card"><div class="comm-title">Historic Downtown Farmers Market</div><div class="comm-meta">Every Sat · 8AM–12PM · Pioneer Ave</div><div class="comm-badge">Weekly (Summer)</div></div>
+<div class="comm-card"><div class="comm-title">Snow Removal Notice — College Dr</div><div class="comm-meta">Parking ban during snow events · 2" trigger</div><div class="comm-badge">Notice</div></div></div>
+        <div class="section-head">Notices &amp; Announcements</div>
+        <div class="alert-list"><div class="alert-card info"><div class="alert-icon">🏛️</div><div><div class="alert-title">Council Agenda: Snow Contract &amp; Downtown Lighting</div><div class="alert-meta">Vote on $2.1M snow removal contract renewal and 30 new LED lights for Lincolnway</div></div></div>
+<div class="alert-card info"><div class="alert-icon">🚧</div><div><div class="alert-title">Lincolnway Sidewalk Repair — Thu–Fri</div><div class="alert-meta">Central Ave to Capitol Ave · Pedestrian detour in place</div></div></div>
+<div class="alert-card info"><div class="alert-icon">📚</div><div><div class="alert-title">LCSD1 Second Semester Quarter Grades Released</div><div class="alert-meta">Access PowerSchool portal · ACT prep night next Thursday at ECHS</div></div></div></div>
+        <div class="section-head" style="margin-top:24px;">Useful Local Links</div>
+        <div class="quick-links"><div class="quick-link"><span class="ql-icon">🗑️</span>City of Cheyenne Sanitation &amp; Trash Pickup</div>
+<div class="quick-link"><span class="ql-icon">⚡</span>Rocky Mountain Power Outage Map</div>
+<div class="quick-link"><span class="ql-icon">🛣️</span>WYDOT 511 — Road Conditions &amp; Closures</div>
+<div class="quick-link"><span class="ql-icon">❄️</span>Cheyenne Snow Removal Tracker</div>
+<div class="quick-link"><span class="ql-icon">🏛️</span>Cheyenne City Council &amp; Laramie County</div>
+<div class="quick-link"><span class="ql-icon">💧</span>Cheyenne Board of Public Utilities</div></div>
+      </div>
+
+      <!-- FOOD & LOCAL -->
+      <div class="tab-section" id="tab-food">
+        <div class="section-head">Food &amp; Local <span class="count">Cheyenne, WY</span></div>
+        <div class="food-grid"><div class="food-card"><div class="food-name">The Albany</div><div class="food-type">Historic Bar &amp; Grill · Downtown Cheyenne</div><div class="food-rating">★★★★☆ 4.5</div></div>
+<div class="food-card"><div class="food-name">Luxury Diner</div><div class="food-type">Classic American · Lincolnway</div><div class="food-rating">★★★★★ 4.8</div></div>
+<div class="food-card"><div class="food-name">Sanford's Grub &amp; Pub</div><div class="food-type">Pub Food + Live Music · Downtown</div><div class="food-rating">★★★★☆ 4.6</div></div>
+<div class="food-card"><div class="food-name">Paramount Grill</div><div class="food-type">Upscale American · 16th St</div><div class="food-rating">★★★★★ 4.7</div></div>
+<div class="food-card"><div class="food-name">Deli Board</div><div class="food-type">Sandwiches + Local Faves · College Dr</div><div class="food-rating">★★★★☆ 4.5</div></div>
+<div class="food-card"><div class="food-name">El Conquistador</div><div class="food-type">Mexican · W. Lincolnway</div><div class="food-rating">★★★★☆ 4.4</div></div>
+<div class="food-card"><div class="food-name">WyoBrews</div><div class="food-type">Craft Beer + Bites · Downtown</div><div class="food-rating">★★★★☆ 4.6</div></div>
+<div class="food-card"><div class="food-name">Sweetgrass Kitchen</div><div class="food-type">Farm-to-Table · Historic District</div><div class="food-rating">★★★★★ 4.8</div></div></div>
+      </div>
+
+      <!-- SMART SECURITY -->
+      <div class="tab-section" id="tab-smart">
+        <div class="smart-hero">
+          <div class="smart-hero-title">Smart <span>Security</span> CheyenneWatch</div>
+          <div class="smart-hero-sub">Protecting downtown Cheyenne, South Side, and Laramie County residential areas. Wyoming winters, high-wind exposure, and frontier-sized properties demand systems spec'd for this climate — not shipped from a coastal warehouse and hoped for the best.</div>
+          <div class="smart-cta-row">
+            <button class="smart-hero-cta" onclick="window.location='tel:6023185756'">📞 Call 602-318-5756</button>
+            <button class="smart-hero-cta outline" onclick="showToast('Scheduling tool coming soon — call us directly!')">📅 Schedule Install</button>
+            <button class="smart-hero-cta outline" onclick="showToast('Free quote form coming soon!')">💬 Get Free Quote</button>
+          </div>
+        </div>
+        <div class="section-head">Services &amp; Solutions</div>
+        
+
+        <div class="svc-grid">
+          <div class="svc-card featured">
+            <div class="svc-header"><div class="svc-icon">🚨</div><div><div class="svc-name">Alarm Verification</div><div class="svc-tag">Reduce False Dispatches</div></div></div>
+            <div class="svc-desc">Audio and video verification before dispatch — cutting false alarm fees and police response delays. Verified signals go to the front of the dispatch queue.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Audio + video pre-dispatch verification</div><div class="svc-bullet">Reduces false alarm fines</div><div class="svc-bullet">Priority police dispatch on confirmed events</div><div class="svc-bullet">Two-way voice with monitoring center</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Talk to a Specialist</button>
+          </div>
+          <div class="svc-card featured">
+            <div class="svc-header"><div class="svc-icon">🛡️</div><div><div class="svc-name">24/7 Professional Monitoring</div><div class="svc-tag">Police · Fire · Medical</div></div></div>
+            <div class="svc-desc">UL-listed monitoring center staffed around the clock. Burglary, fire, CO, flood, and medical panic — one system, live human response.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Police, fire &amp; medical dispatch</div><div class="svc-bullet">Carbon monoxide + flood detection</div><div class="svc-bullet">Cellular backup — works if internet is cut</div><div class="svc-bullet">No long-term contracts required</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Start Monitoring</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🔥</div><div><div class="svc-name">Fire &amp; Life Safety</div><div class="svc-tag">Smoke · Heat · CO</div></div></div>
+            <div class="svc-desc">Integrated smoke, heat, and CO detection tied directly to monitored dispatch. Alerts us before you wake up.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Interconnected smoke + heat detectors</div><div class="svc-bullet">CO detection with monitored dispatch</div><div class="svc-bullet">Tamper-resistant, battery-backup units</div><div class="svc-bullet">Annual inspection &amp; compliance docs</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Get Fire Protection</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🔧</div><div><div class="svc-name">Professional Installation</div><div class="svc-tag">Licensed · Same-Day</div></div></div>
+            <div class="svc-desc">Licensed, background-checked technicians. We run wire right, program clean, walk you through every device. No subcontractors.</div>
+            <div class="svc-bullets"><div class="svc-bullet">State-licensed low-voltage technicians</div><div class="svc-bullet">Same-day and next-day availability</div><div class="svc-bullet">Full system walkthrough on completion</div><div class="svc-bullet">1-year labor warranty on all installs</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Schedule Install</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🛠️</div><div><div class="svc-name">DIY Security Kits</div><div class="svc-tag">Self-Install · App-Controlled</div></div></div>
+            <div class="svc-desc">Pre-configured sensors, cameras, and app setup guides. Plug-and-play hardware. Upgrade to pro monitoring anytime.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Pre-programmed, labeled, ready to mount</div><div class="svc-bullet">Step-by-step video install guides</div><div class="svc-bullet">Upgrade to pro monitoring anytime</div><div class="svc-bullet">Remote support during your install</div></div>
+            <button class="svc-cta" onclick="showToast('DIY kits — call 602-318-5756 for inventory')">Shop DIY Kits</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🚁</div><div><div class="svc-name">Drone Security Patrol</div><div class="svc-tag">Commercial · HOA · Estate</div></div></div>
+            <div class="svc-desc">Scheduled and alarm-triggered drone patrols for large properties, HOA communities, and commercial sites.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Scheduled perimeter patrol flights</div><div class="svc-bullet">Alarm-triggered aerial response</div><div class="svc-bullet">4K thermal + daylight imaging</div><div class="svc-bullet">FAA Part 107 certified operators</div></div>
+            <button class="svc-cta ghost" onclick="window.location='tel:6023185756'">Request Drone Consult</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🔌</div><div><div class="svc-name">PoE Camera Systems</div><div class="svc-tag">Power over Ethernet · Wired</div></div></div>
+            <div class="svc-desc">One CAT6 cable carries power and data. Zero Wi-Fi drops, zero battery changes. The professional standard for permanent installs.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Single CAT6 run — power + video + data</div><div class="svc-bullet">4K/8MP resolution available</div><div class="svc-bullet">4–32 camera configurations</div><div class="svc-bullet">No monthly cloud fees — local storage</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Design My System</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">📡</div><div><div class="svc-name">Streaming Video Recorder</div><div class="svc-tag">SVR · Cloud + Local</div></div></div>
+            <div class="svc-desc">Hybrid SVR systems that store locally and stream to the cloud simultaneously. View live or pull footage from anywhere.</div>
+            <div class="svc-bullets"><div class="svc-bullet">Simultaneous local + cloud recording</div><div class="svc-bullet">Remote live view from any device</div><div class="svc-bullet">30–90 day retention options</div><div class="svc-bullet">Encrypted upload — HIPAA/CJIS compatible</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Get SVR Quote</button>
+          </div>
+          <div class="svc-card">
+            <div class="svc-header"><div class="svc-icon">🖥️</div><div><div class="svc-name">Network Video Recorder</div><div class="svc-tag">NVR · On-Premise</div></div></div>
+            <div class="svc-desc">Enterprise-grade NVR for homes and businesses needing max control, no cloud dependency, high-volume storage.</div>
+            <div class="svc-bullets"><div class="svc-bullet">4–64 channel configurations</div><div class="svc-bullet">Up to 32TB on-site storage</div><div class="svc-bullet">RAID redundancy options available</div><div class="svc-bullet">AI motion analytics + license plate recognition</div></div>
+            <button class="svc-cta" onclick="window.location='tel:6023185756'">Build My NVR</button>
+          </div>
+        </div>
+
+        <div class="section-head">Why Neighbors Call Us First</div>
+        <div class="alert-list"><div class="alert-card smart"><div class="alert-icon">🌨️</div><div><div class="alert-title">Wyoming Winter-Rated Equipment</div><div class="alert-meta">All hardware spec'd for -30°F operation · Heated housing on exterior cameras · No California-grade units that fail in a blizzard</div></div></div>
+<div class="alert-card smart"><div class="alert-icon">⚡</div><div><div class="alert-title">Same-Day Install Available</div><div class="alert-meta">Licensed technicians ready today · Call before noon, installed before dark</div></div></div>
+<div class="alert-card smart"><div class="alert-icon">🏚️</div><div><div class="alert-title">We Know Cheyenne's Vulnerabilities</div><div class="alert-meta">Vacant downtown properties, detached outbuildings, ranch perimeters — we cover the footprint that makes sense here</div></div></div>
+<div class="alert-card smart"><div class="alert-icon">📋</div><div><div class="alert-title">LCSO False Alarm Compliance</div><div class="alert-meta">We register your system with Laramie County, keep you penalty-free, and handle the paperwork</div></div></div></div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      
+
+      <div class="sidebar-widget">
+        <div class="widget-head smart-head">🛡 Security System Status</div>
+        <div class="widget-body">
+          <div class="mon-row"><span class="mon-dot online"></span><span class="mon-label">Front Door Camera</span><span class="mon-time">Live</span></div>
+          <div class="mon-row"><span class="mon-dot online"></span><span class="mon-label">Driveway Camera</span><span class="mon-time">Live</span></div>
+          <div class="mon-row"><span class="mon-dot online"></span><span class="mon-label">Alarm Panel</span><span class="mon-time">Armed · Away</span></div>
+          <div class="mon-row"><span class="mon-dot warn"></span><span class="mon-label">Sliding Door Sensor</span><span class="mon-time">Low Battery</span></div>
+          <div class="mon-row"><span class="mon-dot offline"></span><span class="mon-label">Pool/Exterior Camera</span><span class="mon-time">Offline</span></div>
+        </div>
+      </div>
+      <div class="sidebar-widget">
+        <div class="widget-head" style="background:var(--dusk);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>🔔 Maintenance Reminders</span><span style="font-size:.52rem;color:rgba(255,255,255,.35);">TAP TO MARK DONE</span>
+        </div>
+        <div class="reminder-list">
+          <div class="reminder-row overdue" onclick="markDone(this,'Smoke Detector Batteries')"><div class="rem-icon">🔋</div><div class="rem-text"><div class="rem-title">Replace Smoke Detector Batteries</div><div class="rem-sub">Every 6 months · Tap to log done</div></div><span class="rem-badge overdue">Overdue</span></div>
+          <div class="reminder-row due" onclick="markDone(this,'Door/Window Sensor Batteries')"><div class="rem-icon">🔋</div><div class="rem-text"><div class="rem-title">Replace Sensor Batteries</div><div class="rem-sub">Door/window sensors · Due this month</div></div><span class="rem-badge due">Due Now</span></div>
+          <div class="reminder-row due" onclick="markDone(this,'Camera Lens Cleaning')"><div class="rem-icon">🧹</div><div class="rem-text"><div class="rem-title">Clean Camera Lenses</div><div class="rem-sub">Dust kills night vision · Quarterly</div></div><span class="rem-badge due">Due Now</span></div>
+          <div class="reminder-row" onclick="markDone(this,'Monthly Alarm Panel Test')"><div class="rem-icon">🔊</div><div class="rem-text"><div class="rem-title">Test Alarm Panel &amp; Sirens</div><div class="rem-sub">Monthly · Call monitoring center first</div></div><span class="rem-badge ok">On Track</span></div>
+          <div class="reminder-row" onclick="markDone(this,'Motion Sensor Walk Test')"><div class="rem-icon">🚶</div><div class="rem-text"><div class="rem-title">Motion Sensor Walk Test</div><div class="rem-sub">Verify all zones trigger correctly</div></div><span class="rem-badge ok">On Track</span></div>
+          <div class="reminder-row overdue" onclick="markDone(this,'CO Detector Expiration')"><div class="rem-icon">💨</div><div class="rem-text"><div class="rem-title">CO Detector Expiration Check</div><div class="rem-sub">Units expire 5–7 yrs · Check date on back</div></div><span class="rem-badge overdue">Check Date</span></div>
+          <div class="reminder-row due" onclick="markDone(this,'Alarm Passcode Update')"><div class="rem-icon">🔑</div><div class="rem-text"><div class="rem-title">Update Alarm Passcodes</div><div class="rem-sub">Every 90 days or after guest access</div></div><span class="rem-badge due">Due Now</span></div>
+          <div class="reminder-row" onclick="markDone(this,'NVR/DVR Storage Check')"><div class="rem-icon">💾</div><div class="rem-text"><div class="rem-title">DVR/NVR Storage Health Check</div><div class="rem-sub">Verify footage saving correctly · Monthly</div></div><span class="rem-badge ok">On Track</span></div>
+          <div class="reminder-row" onclick="markDone(this,'PoE Switch Check')"><div class="rem-icon">🔌</div><div class="rem-text"><div class="rem-title">PoE Switch &amp; Cable Inspection</div><div class="rem-sub">Check terminations + port lights · Quarterly</div></div><span class="rem-badge ok">On Track</span></div>
+          <div class="reminder-row" onclick="markDone(this,'Annual Pro Inspection')"><div class="rem-icon">📋</div><div class="rem-text"><div class="rem-title">Annual Professional Inspection</div><div class="rem-sub">Full system cert · Call 602-318-5756</div></div><span class="rem-badge ok">Scheduled</span></div>
+        </div>
+        <div class="sub-form">
+          <div class="sub-label">📧 Subscribe to Reminder Alerts</div>
+          <div class="sub-row"><input class="sub-input" type="email" id="sub-email" placeholder="your@email.com"><button class="sub-btn" onclick="subscribeReminders()">Subscribe</button></div>
+          <div class="sub-note">Monthly maintenance digest + seasonal tips. No spam. Unsubscribe anytime.</div>
+        </div>
+      </div>
+      <div class="sidebar-widget">
+        <div class="widget-head smart-head">🏠 Smart Home Products</div>
+        <div class="widget-body">
+          <div class="product-row">
+            <div class="product-btn" onclick="openPirate(0)"><span class="icon">📷</span><span class="label">Cameras</span></div>
+            <div class="product-btn" onclick="openPirate(0)"><span class="icon">🔔</span><span class="label">Doorbell</span></div>
+            <div class="product-btn" onclick="openPirate(2)"><span class="icon">🔒</span><span class="label">Smart Lock</span></div>
+            <div class="product-btn" onclick="openPirate(4)"><span class="icon">💡</span><span class="label">Lighting</span></div>
+            <div class="product-btn" onclick="openPirate(1)"><span class="icon">🛡️</span><span class="label">Monitoring</span></div>
+            <div class="product-btn" onclick="openPirate(3)"><span class="icon">🪟</span><span class="label">Glass Break</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-widget">
+        <div class="widget-head smart-head">📞 Free Consultation</div>
+        <div class="contact-block">
+          <div class="cb-title">Talk to a Security Specialist</div>
+          <div class="cb-sub">No pressure. Local operators who know your area. Real conversation, real protection.</div>
+          <a class="cb-phone" href="tel:6023185756">602-318-5756</a>
+          <div class="cb-or">— or —</div>
+          <a class="cb-email" href="mailto:info@aaasmartsecurity.com">info@aaasmartsecurity.com</a>
+          <div class="cb-tagline">We know this neighborhood.</div>
+        </div>
+      </div>
+
+      <div class="sidebar-widget">
+        <div class="widget-head">🔒 Today's Safety Tip</div>
+        <div class="widget-body" style="padding:0;">
+          <div class="safety-tip">
+            <div class="tip-icon">🌨️</div>
+            <div><div class="tip-head">Blizzards Are Cover for Break-Ins</div><div class="tip-text">Heavy snow masks footprints, muffles sound, and keeps neighbors inside. Motion-activated lights and a monitored system are your eyes when visibility drops to zero. Don't go dark during a storm.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-widget">
+        <div class="widget-head">📞 Emergency &amp; Local</div>
+        <div class="widget-body"><div class="emerg-link"><span class="ql-icon">🚔</span>Cheyenne PD Non-Emergency: 307-637-6525</div>
+<div class="emerg-link"><span class="ql-icon">🚒</span>Cheyenne Fire Non-Emergency: 307-637-6430</div>
+<div class="emerg-link"><span class="ql-icon">🏥</span>Cheyenne Regional Medical: 307-634-2273</div>
+<div class="emerg-link"><span class="ql-icon">🛣️</span>WYDOT 511 Road Conditions</div>
+<div class="emerg-link"><span class="ql-icon">❄️</span>City of Cheyenne Snow Removal Hotline</div>
+<div class="emerg-link"><span class="ql-icon">🛡️</span>Smart Security: 602-318-5756</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="brand-footer">
+  <div>
+    <div class="bf-name">Smart <span>Security</span></div>
+    <div class="bf-tagline">Serving Cheyenne &amp; Laramie County, WY · Locally operated</div>
+  </div>
+  <div class="bf-contact">
+    <a class="bf-phone" href="tel:6023185756">602-318-5756</a>
+    <div class="bf-email"><a class="cb-email" href="mailto:info@aaasmartsecurity.com">info@aaasmartsecurity.com</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const VIDEOS=[
+  {id:'h4T_LlK1VE4',caption:'<strong>Glitter Bomb 3.0</strong> — Former NASA engineer rigs a bait package with glitter, fart spray and hidden cameras. Priceless.'},
+  {id:'3c584TGG7jQ',caption:'<strong>Glitter Bomb 4.0</strong> — Upgraded with pneumatic lid, car horn, triple-dose glitter. Watch til the end.'},
+  {id:'iWeu2dxHRDg',caption:'<strong>Glitter Bomb 5.0 with Drones</strong> — Autonomous glitter drones chase the thief around their own driveway.'},
+  {id:'iWWWyG5ZwG8',caption:'<strong>Glitter Bomb 6.0 — Car Thieves Edition</strong> — Bait car, in-car jump scare, the works. Karma delivered.'},
+  {id:'XGhVdgxx8b8',caption:'<strong>Instant Karma Strikes Again</strong> — Greatest hits of people attempting mischief and regretting it.'},
+  {id:'5qHfyk3VTvM',caption:'<strong>Best Boomerang Karma</strong> — What goes around comes around. The neighborhood is watching.'}
+];
+let currentVideo=0;
+function openPirate(idx){currentVideo=idx||0;document.getElementById('pirate-overlay').classList.add('active');loadVideo(currentVideo);document.body.classList.remove('busted');void document.body.offsetWidth;document.body.classList.add('busted');setTimeout(()=>document.body.classList.remove('busted'),2000);}
+function closePirate(){document.getElementById('pirate-overlay').classList.remove('active');document.getElementById('pirate-iframe').src='';}
+function loadVideo(idx){const v=VIDEOS[idx];document.getElementById('pirate-iframe').src='https://www.youtube.com/embed/'+v.id+'?autoplay=1&rel=0&modestbranding=1';document.getElementById('pirate-caption').innerHTML=v.caption;document.querySelectorAll('.vtab').forEach((t,i)=>t.classList.toggle('active',i===idx));}
+function switchVideo(idx){currentVideo=idx;loadVideo(idx);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePirate();});
+function switchTab(tabName){document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.tab===tabName));document.querySelectorAll('.tab-section').forEach(s=>s.classList.toggle('active',s.id==='tab-'+tabName));window.scrollTo({top:document.querySelector('.ticker').offsetTop,behavior:'smooth'});}
+document.querySelectorAll('.nav-item[data-tab]').forEach(item=>item.addEventListener('click',function(){switchTab(this.dataset.tab);}));
+function toggleTheme(){const html=document.documentElement;const btn=document.getElementById('theme-btn');const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');btn.textContent=isDark?'🌙':'☀️';try{localStorage.setItem('vw-theme',html.getAttribute('data-theme'));}catch(e){}}
+(function(){try{const saved=localStorage.getItem('vw-theme');if(saved){document.documentElement.setAttribute('data-theme',saved);document.getElementById('theme-btn').textContent=saved==='dark'?'☀️':'🌙';}}catch(e){}})();
+function startClock(tz){function tick(){try{const now=new Date();const t=now.toLocaleTimeString('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});const d=now.toLocaleDateString('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});const el=document.getElementById('live-time');if(el)el.textContent=d+' · '+t;}catch(e){}}tick();setInterval(tick,1000);}
+function showToast(msg,dur){dur=dur||3000;const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+document.querySelectorAll('.quick-link,.food-card,.comm-card').forEach(function(el){el.addEventListener('click',function(){showToast('Full link integration coming soon.');});});
+function markDone(row,label){row.style.opacity='0.45';row.style.pointerEvents='none';const badge=row.querySelector('.rem-badge');if(badge){badge.textContent='Done';badge.className='rem-badge ok';}row.classList.remove('due','overdue');showToast('Logged: '+label);try{const done=JSON.parse('vw-done',JSON.stringify(done));}catch(e){}}
+function subscribeReminders(){const input=document.getElementById('sub-email');const val=input?input.value.trim():'';if(!val||!val.includes('@')){showToast('Enter a valid email address first.');return;}showToast('Subscribed! Reminders coming to '+val);if(input)input.value='';}
+
+
+/* ══ WEATHER THEME ENGINE ══════════════════════════════════════════════════ */
+(function(){
+  var CITY_TZ    = 'America/Denver';
+  var CITY_CLIMATE = 'high_plains';
+  var CITY_LAT   = 41.1;
+
+  /* ── Helpers ── */
+  function nowInTZ(tz){
+    var s=new Date().toLocaleString('en-US',{timeZone:tz,hour:'numeric',minute:'numeric',month:'numeric',day:'numeric',hour12:false});
+    var p=s.split(/[,\s\/]+/);
+    // returns {month,day,hour,minute}
+    return {month:parseInt(p[0]),day:parseInt(p[1]),hour:parseInt(p[2]),minute:parseInt(p[3]||0)};
+  }
+
+  function getSeason(month){
+    if(month>=3&&month<=5)  return 'spring';
+    if(month>=6&&month<=8)  return 'summer';
+    if(month>=9&&month<=11) return 'fall';
+    return 'winter';
+  }
+
+  function getTimeOfDay(hour){
+    if(hour>=5 &&hour<8)  return 'dawn';
+    if(hour>=8 &&hour<18) return 'day';
+    if(hour>=18&&hour<21) return 'dusk';
+    return 'night';
+  }
+
+  /* Climate-season weather effect mapping */
+  function getEffect(climate, season, tod){
+    var effects={
+      desert_hot:{
+        summer:  {day:'heat',    dawn:'heat',  dusk:'heat',  night:'stars'},
+        spring:  {day:'dust',    dawn:'clear', dusk:'dust',  night:'stars'},
+        fall:    {day:'dust',    dawn:'clear', dusk:'dust',  night:'stars'},
+        winter:  {day:'clear',   dawn:'clear', dusk:'clear', night:'stars'},
+      },
+      high_desert:{
+        summer:  {day:'heat',    dawn:'clear', dusk:'heat',  night:'stars'},
+        spring:  {day:'clear',   dawn:'clear', dusk:'clear', night:'stars'},
+        fall:    {day:'leaves',  dawn:'clear', dusk:'leaves',night:'stars'},
+        winter:  {day:'snow',    dawn:'snow',  dusk:'snow',  night:'snow'},
+      },
+      high_plains:{
+        summer:  {day:'clear',   dawn:'clear', dusk:'clear', night:'stars'},
+        spring:  {day:'leaves',  dawn:'clear', dusk:'clear', night:'stars'},
+        fall:    {day:'leaves',  dawn:'leaves',dusk:'leaves',night:'stars'},
+        winter:  {day:'blizzard',dawn:'snow',  dusk:'snow',  night:'snow'},
+      },
+      valley:{
+        summer:  {day:'heat',    dawn:'haze',  dusk:'haze',  night:'stars'},
+        spring:  {day:'clear',   dawn:'clear', dusk:'clear', night:'stars'},
+        fall:    {day:'leaves',  dawn:'haze',  dusk:'leaves',night:'stars'},
+        winter:  {day:'haze',    dawn:'snow',  dusk:'snow',  night:'snow'},
+      },
+      mountain:{
+        summer:  {day:'clear',   dawn:'clear', dusk:'clear', night:'stars'},
+        spring:  {day:'leaves',  dawn:'clear', dusk:'leaves',night:'stars'},
+        fall:    {day:'leaves',  dawn:'leaves',dusk:'leaves',night:'stars'},
+        winter:  {day:'snow',    dawn:'snow',  dusk:'snow',  night:'snow'},
+      },
+    };
+    var c=effects[climate]||effects['valley'];
+    var s=c[season]||c['winter'];
+    return s[tod]||'clear';
+  }
+
+  /* ── Apply theme class ── */
+  function applyTheme(tod, season){
+    var cls='theme-'+tod+'-'+season;
+    var body=document.body;
+    // Remove all theme classes
+    body.className=body.className.replace(/theme-\S+/g,'').trim();
+    body.classList.add(cls);
+  }
+
+  /* ── Weather badge ── */
+  function updateBadge(effect, tod, season){
+    var badge=document.getElementById('weather-badge');
+    if(!badge)return;
+    var icons={snow:'❄️',blizzard:'🌨️',rain:'🌧️',heat:'🌡️',dust:'🌵',haze:'🌫️',leaves:'🍂',clear:'',stars:'✨'};
+    var labels={snow:'Snow',blizzard:'Blizzard',rain:'Rain',heat:'Heat',dust:'Dust',haze:'Haze',leaves:'Fall',clear:'Clear',stars:'Clear Night'};
+    var todLabel={dawn:'Dawn',day:'Day',dusk:'Dusk',night:'Night'};
+    var icon=icons[effect]||'';
+    var lbl=labels[effect]||'';
+    badge.textContent=(icon?icon+' ':'')+todLabel[tod]+(lbl?' · '+lbl:'');
+  }
+
+  /* ── Canvas Particle Engine ── */
+  var canvas=document.getElementById('weather-canvas');
+  if(!canvas){canvas=document.createElement('canvas');canvas.id='weather-canvas';document.body.insertBefore(canvas,document.body.firstChild);}
+  var ctx=canvas.getContext('2d');
+  var particles=[];
+  var animFrame=null;
+  var currentEffect='clear';
+
+  function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  window.addEventListener('resize',resizeCanvas);
+  resizeCanvas();
+
+  function makeParticle(effect){
+    var w=canvas.width, h=canvas.height;
+    var p={x:Math.random()*w, y:Math.random()*h*-0.5, life:1};
+    if(effect==='snow'||effect==='blizzard'){
+      var speed = effect==='blizzard' ? 4+Math.random()*4 : 1.5+Math.random()*2;
+      var size  = effect==='blizzard' ? 1.5+Math.random()*3 : 2+Math.random()*3;
+      var drift = effect==='blizzard' ? (Math.random()-0.5)*4 : (Math.random()-0.5)*0.8;
+      p.type='snow'; p.vx=drift; p.vy=speed; p.r=size; p.opacity=0.5+Math.random()*0.5;
+    } else if(effect==='rain'){
+      p.type='rain'; p.vx=-1+Math.random()*0.5; p.vy=8+Math.random()*6;
+      p.len=10+Math.random()*15; p.opacity=0.2+Math.random()*0.3;
+    } else if(effect==='heat'){
+      p.type='heat'; p.x=Math.random()*w; p.y=h*0.5+Math.random()*h*0.5;
+      p.vx=(Math.random()-0.5)*0.3; p.vy=-(0.3+Math.random()*0.5);
+      p.r=2+Math.random()*4; p.opacity=0.04+Math.random()*0.06; p.life=1;
+    } else if(effect==='haze'){
+      p.type='haze'; p.x=Math.random()*w; p.y=Math.random()*h*0.6;
+      p.vx=(Math.random()-0.5)*0.15; p.vy=-0.05-Math.random()*0.1;
+      p.r=60+Math.random()*120; p.opacity=0.03+Math.random()*0.04; p.life=1;
+    } else if(effect==='dust'){
+      p.type='dust'; p.y=h*0.3+Math.random()*h*0.5;
+      p.vx=1+Math.random()*2; p.vy=(Math.random()-0.5)*0.3;
+      p.r=1+Math.random()*2; p.opacity=0.15+Math.random()*0.2;
+    } else if(effect==='leaves'){
+      p.type='leaf'; p.vx=(Math.random()-0.5)*1.5+0.5; p.vy=0.8+Math.random()*1.2;
+      p.rot=Math.random()*Math.PI*2; p.rotv=(Math.random()-0.5)*0.08;
+      p.size=4+Math.random()*5;
+      var colors=['#c84820','#e07010','#d4a010','#8b3a10','#b06820'];
+      p.color=colors[Math.floor(Math.random()*colors.length)];
+    } else if(effect==='stars'){
+      p.type='star'; p.x=Math.random()*w; p.y=Math.random()*h*0.5;
+      p.r=0.5+Math.random()*1.2; p.opacity=0.3+Math.random()*0.7;
+      p.twinkle=Math.random()*Math.PI*2; p.twinkleSpeed=0.02+Math.random()*0.04;
+      p.vx=0; p.vy=0;
+      // stars don\'t fall
+    }
+    return p;
+  }
+
+  function getParticleCount(effect){
+    var counts={snow:120,blizzard:280,rain:150,heat:80,haze:18,dust:60,leaves:45,stars:80,clear:0};
+    return counts[effect]||0;
+  }
+
+  function initParticles(effect){
+    particles=[];
+    currentEffect=effect;
+    var count=getParticleCount(effect);
+    for(var i=0;i<count;i++){
+      var p=makeParticle(effect);
+      if(effect!=='stars'){
+        // Distribute vertically on init so it doesn't start empty
+        p.y=Math.random()*canvas.height;
+      }
+      particles.push(p);
+    }
+  }
+
+  function drawParticle(p){
+    ctx.save();
+    if(p.type==='snow'){
+      ctx.globalAlpha=p.opacity;
+      ctx.fillStyle='#ffffff';
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    } else if(p.type==='rain'){
+      ctx.globalAlpha=p.opacity;
+      ctx.strokeStyle='#a8c8f0';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.vx*p.len/p.vy,p.y+p.len);ctx.stroke();
+    } else if(p.type==='heat'){
+      ctx.globalAlpha=p.opacity;
+      var grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+      grad.addColorStop(0,'rgba(255,160,40,0.4)');
+      grad.addColorStop(1,'rgba(255,100,0,0)');
+      ctx.fillStyle=grad;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);ctx.fill();
+    } else if(p.type==='haze'){
+      ctx.globalAlpha=p.opacity;
+      var grad2=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+      grad2.addColorStop(0,'rgba(180,190,200,0.5)');
+      grad2.addColorStop(1,'rgba(180,190,200,0)');
+      ctx.fillStyle=grad2;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    } else if(p.type==='dust'){
+      ctx.globalAlpha=p.opacity;
+      ctx.fillStyle='#c8a060';
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    } else if(p.type==='leaf'){
+      ctx.globalAlpha=0.7;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.fillStyle=p.color;
+      ctx.beginPath();
+      ctx.ellipse(0,0,p.size,p.size*0.6,0,0,Math.PI*2);
+      ctx.fill();
+    } else if(p.type==='star'){
+      var tw=0.5+0.5*Math.sin(p.twinkle);
+      ctx.globalAlpha=p.opacity*tw;
+      ctx.fillStyle='#ffffff';
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function updateParticle(p){
+    var w=canvas.width, h=canvas.height;
+    if(p.type==='star'){
+      p.twinkle+=p.twinkleSpeed;
+      return true;
+    }
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.type==='leaf') p.rot+=p.rotv;
+    if(p.type==='heat'||p.type==='haze'){
+      p.opacity*=0.995;
+      if(p.y<-50||p.opacity<0.005) return false;
+    }
+    if(p.y>h+20||p.x<-50||p.x>w+50) return false;
+    return true;
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(currentEffect==='clear'){animFrame=requestAnimationFrame(animate);return;}
+    // Replenish
+    var target=getParticleCount(currentEffect);
+    while(particles.length<target){particles.push(makeParticle(currentEffect));}
+    for(var i=particles.length-1;i>=0;i--){
+      drawParticle(particles[i]);
+      if(!updateParticle(particles[i])) particles.splice(i,1);
+    }
+    animFrame=requestAnimationFrame(animate);
+  }
+
+  /* ── Main Init ── */
+  function initWeather(){
+    var now=nowInTZ(CITY_TZ);
+    var season=getSeason(now.month);
+    var tod=getTimeOfDay(now.hour);
+    var effect=getEffect(CITY_CLIMATE, season, tod);
+    applyTheme(tod, season);
+    updateBadge(effect, tod, season);
+    initParticles(effect);
+    if(animFrame) cancelAnimationFrame(animFrame);
+    animate();
+  }
+
+  // Run on load
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',initWeather);
+  } else {
+    initWeather();
+  }
+
+  // Refresh at the top of each hour
+  var now2=new Date();
+  var msToNextHour=(3600-now2.getMinutes()*60-now2.getSeconds())*1000;
+  setTimeout(function(){initWeather();setInterval(initWeather,3600000);},msToNextHour);
+
+})();
+/* ══ END WEATHER THEME ENGINE ══════════════════════════════════════════════ */
+
+</script>
+</body>
+</html>
