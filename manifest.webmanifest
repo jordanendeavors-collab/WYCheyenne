@@ -1,0 +1,41 @@
+{
+ "name": "Cheyenne Watch",
+ "short_name": "Cheyenne Watch",
+ "description": "Live weather, alerts, police activity, earthquakes, wildfire reports, emergency numbers, and nearby places for Cheyenne, Wyoming.",
+ "id": "/",
+ "start_url": "/",
+ "scope": "/",
+ "display": "standalone",
+ "background_color": "#16120a",
+ "theme_color": "#16120a",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "shortcuts": [
+  {
+   "name": "Alerts",
+   "url": "/#alerts"
+  },
+  {
+   "name": "Emergency and nearby",
+   "url": "/#emergency"
+  }
+ ]
+}
